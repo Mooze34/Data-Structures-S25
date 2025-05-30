@@ -1,0 +1,74 @@
+# MXA220164 
+# Mustafa Alawad 
+# CS 3345.009
+# Project 1 extra credit 
+
+---------------------------------------------------------------------------------------
+
+# Top-Down Splay Pseudocode
+# This function finds a key and splays it in one pass.
+# It uses two temporary piles (leftPile and rightPile) to hold nodes.
+
+def TopDownSplay(root, key):
+    if root is null:
+        return null  # nothing to splay if tree is empty
+
+    # Create a false/empty node to help us stick things together
+    header = new Node(false)
+    leftPile = header   # will collect nodes with keys < key
+    rightPile = header  # will collect nodes with keys > key
+
+    # Keep moving until we find the key or run out of nodes
+    while True:
+        if key < root.key:
+            if root.left is null:
+                break  # can't go left anymore
+            # If key is even smaller than the left child, do a right rotate (zig-zig)
+            if key < root.left.key:
+                root = rightRotate(root)
+                if root.left is null:
+                    break
+            # Link the current root to the right pile and go left
+            rightPile.left = root
+            rightPile = root
+            root = root.left
+
+        elif key > root.key:
+            if root.right is null:
+                break  # can't go right anymore
+            # If key is bigger than the right child, do a left rotate (zig-zig)
+            if key > root.right.key:
+                root = leftRotate(root)
+                if root.right is null:
+                    break
+            # Link the current root to the left pile and go right
+            leftPile.right = root
+            leftPile = root
+            root = root.right
+
+        else:
+            # Found
+            break
+
+    # Reassemble the tree: stick the piles back together
+    leftPile.right = root.left
+    rightPile.left = root.right
+    root.left = header.right  # everything less than key
+    root.right = header.left  # everything greater than key
+
+    return root
+
+# Helper functions for rotations (left and right):
+def rightRotate(x):
+    y = x.left
+    x.left = y.right
+    y.right = x
+    return y
+
+def leftRotate(x):
+    y = x.right
+    x.right = y.left
+    y.left = x
+    return y
+
+# end 
